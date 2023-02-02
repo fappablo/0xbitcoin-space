@@ -1,0 +1,207 @@
+@font-face {
+  font-family: Relics;
+  src: url("/public/font/PixeloidSansBold-RpeJo.woff2");
+}
+
+@media only screen and (hover: none) and (pointer: coarse) {
+  .mobile-only {
+    display: unset !important;
+  }
+}
+
+.circle-color-picker {
+  background-color: rgba(128, 128, 128, 0.632);
+  border-radius: 2px;
+  padding: 5px 15px;
+}
+
+.shopping-cart {
+  padding: 5px 15px;
+  color: black;
+  background-color: rgba(128, 128, 128, 0.632);
+  border-radius: 2px;
+  user-select: none;
+}
+
+.shopping-cart-list {
+  max-height: 30vh;
+  overflow: scroll;
+}
+
+
+.coordinate-tooltip {
+  position: relative;
+  padding: 5px 15px;
+  color: black;
+  background-color: rgba(128, 128, 128, 0.632);
+  border-radius: 2px;
+  pointer-events: none;
+  max-width: fit-content;
+  user-select: none;
+}
+
+.tooltip-color-selection {
+  background: transparent;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  border-radius: 50%;
+  box-shadow: #000000 0px 0px 0px 15px inset;
+}
+
+.cart-color-section {
+  background: transparent;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  border-radius: 50%;
+}
+
+.tooltip-color-outer {
+  width: 12px;
+  height: 12px;
+}
+
+.canvas-wrapper {
+  width: 100vw;
+  height: calc(100vh - 184px - 10vh);
+  overflow: scroll;
+  position: relative;
+  margin: auto;
+}
+
+.place-canvas {
+  z-index: 0;
+  image-rendering: pixelated;
+  background: white;
+}
+
+
+:root {
+  --site-primary: hsl(247, 24%, 14%);
+  --site-primary-alpha: hsla(247, 24%, 14%, 0.9);
+  --site-secondary: hsl(0, 0%, 100%);
+  --site-accent-light: hsl(218, 100%, 69%);
+  --site-accent-dark: hsl(218, 100%, 54%);
+  --font-color: hsl(0, 0%, 100%);
+  --font-color-inverse: hsl(247, 24%, 14%);
+  --gui-primary: hsl(247 8% 30%);
+  --gui-secondary: hsl(247 24% 20%);
+  --gui-accent: hsl(248, 24%, 20%);
+  --gui-accent-hover: hsl(248, 40%, 100%);
+  --gui-accent-text: hsl(247, 24%, 14%);
+  --gui-text: hsl(0, 0%, 100%);
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  font-family: "Relics" !important;
+  overflow: visible !important;
+  background-color: var(--site-primary) !important;
+}
+
+html {
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+}
+
+html:hover {
+  scrollbar-color: hsla(0, 0%, 100%, 0.75) transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(0, 0%, 100%, 0.75);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(0, 0%, 100%);
+  border-radius: 5px;
+}
+
+
+.no-overflow {
+  overflow: hidden !important;
+}
+
+.mobile-only {
+  display: none !important;
+}
+
+.hide {
+  display: none;
+  visibility: hidden;
+}
+
+.center {
+  text-align: center;
+}
+
+.pixel-art {
+  image-rendering: pixelated;
+}
+
+.white-text {
+  color: var(--font-color);
+}
+
+.button {
+  color: var(--font-color);
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  background-color: var(--site-primary);
+  border: 1px solid transparent;
+  padding: 5px 10px;
+  border-radius: 10px;
+  transition:
+    color .5s,
+    background-color .5s,
+    border-color .5s,
+    box-shadow .5s,
+    transform .5s;
+}
+
+.button:hover,
+.button:active,
+.button:focus {
+  border: 1px solid var(--site-primary);
+  color: var(--font-color);
+}
+
+.button:active {
+  box-shadow: 0 0 0 0.25rem var(--site-primary-alpha) !important;
+}
+
+.button:disabled,
+.button.disabled {
+  pointer-events: none;
+  opacity: .65;
+}
+
+.button:focus,
+.button:active:focus {
+  outline: none;
+}
