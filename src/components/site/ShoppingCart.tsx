@@ -16,13 +16,14 @@ const ShoppingCart = ({ pixels, removePixel }: ShoppingCartProps) => {
         if (pixels) {
             pixels.forEach((item, index) => {
                 divs.push(
-                    <div>{"x: " + item[0] + " y:" + item[1]}
+                    <div>
+                        <div className="coords">{"x: " + item[0] + " y: " + item[1]}</div>
                         <div className="tooltip-color-outer">
                             <span>
                                 <div className={"cart-color-section"} style={{ 'boxShadow': `${item[2]} 0px 0px 0px 15px inset` }}></div>
-                                <Button onClick={() => { removePixel(index) }}>Remove</Button >
                             </span>
                         </div>
+                        <Button onClick={() => { removePixel(index) }}>Remove</Button >
                     </div>
                 );
             });
