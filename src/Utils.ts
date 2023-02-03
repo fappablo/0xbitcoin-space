@@ -24,6 +24,7 @@ export interface TooltipProps {
 }
 
 export interface ShoppingCartProps {
+    loadWeb3Modal?: any;
     provider?: any;
     pixels?: [number, number, string][]
     removePixel: (i: number) => void;

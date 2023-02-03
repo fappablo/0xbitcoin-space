@@ -4,10 +4,12 @@ import Button from 'react-bootstrap/Button';
 import { Contract } from "@ethersproject/contracts";
 import { addresses, abis } from "../../contracts/src";
 import { Web3Provider } from "@ethersproject/providers";
+import { useAlert } from "react-alert";
 
-const ShoppingCart = ({ provider, pixels, removePixel, clearPixels }: ShoppingCartProps) => {
+const ShoppingCart = ({ loadWeb3Modal, provider, pixels, removePixel, clearPixels }: ShoppingCartProps) => {
 
     const [elements, setElements] = useState<ReactElement[]>();
+    const alert = useAlert();
 
     const purchasePixels = async () => {
         if (provider === null) {
@@ -29,7 +31,18 @@ const ShoppingCart = ({ provider, pixels, removePixel, clearPixels }: ShoppingCa
             y.push(item[1]);
             colors.push("0x" + item[2].replace('#', ''));
         });
-        await contract.placePixels(x, y, colors);
+        let txhash: string, error;
+        await contract.placePixels(x, y, colors).then(async (res: any) => {
+            txhash = res.hash;
+            const web3provider = new Web3Provider(provider);
+            let txn = await web3provider.waitForTransaction(txhash);
+            if (txn.status) {
+                alert.success("Transaction succeded! \n Your pixels should appear in less than a minute");
+            } else {
+                alert.error("There was an error in the transaction");
+            }
+        }).catch((err: any) => { alert.error("There was an error\n" + err); });
+
         clearPixels();
     }
 
@@ -51,7 +64,8 @@ const ShoppingCart = ({ provider, pixels, removePixel, clearPixels }: ShoppingCa
     return (
         <div className={"shopping-cart"}>
             <div className={"shopping-cart-list"}>{elements}</div>
-            <Button onClick={purchasePixels}>Buy</Button>
+            <Button onClick={provider ? purchasePixels : loadWeb3Modal}>{provider ? "Buy" : "Connect"}</Button>
+            <Button onClick={clearPixels}>Clear</Button>
         </div>
     );
 };

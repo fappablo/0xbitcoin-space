@@ -35,10 +35,13 @@ const Tooltip = ({ scale, matrix, canvas }: TooltipProps) => {
         return (() => {
             canvas.removeEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX - rect.left);
-                const y = (e.clientY - rect.top);
+                const x = (e.x - rect.left);
+                const y = (e.y - rect.top);
+                if (!matrix[Math.floor(x / scale)] || !matrix[Math.floor(x / scale)][Math.floor(y / scale)]) {
+                    return;
+                }
                 setCoords([Math.floor(x / scale), Math.floor(y / scale)]);
-                tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / scale) + "px," + (y + tooltip.clientHeight + 10) + "px)";
+                tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / scale) + "px," + (y + tooltip.clientHeight / 4) + "px)";
             });
         })
 
@@ -55,7 +58,7 @@ const Tooltip = ({ scale, matrix, canvas }: TooltipProps) => {
                     <div className="tooltip-color-selection" ref={colorSelectionRef}></div>
                 </span>
             </div> */}
-            <div>{(matrix[coords[0]][coords[1]].name !== 'null') ? matrix[coords[0]][coords[1]].name : (matrix[coords[0]][coords[1]].owner).substring(0, 10)}</div>
+            <div>{(matrix[coords[0]][coords[1]].name !== null) ? matrix[coords[0]][coords[1]].name : (matrix[coords[0]][coords[1]].owner).substring(0, 10)}</div>
         </div>
     );
 };
