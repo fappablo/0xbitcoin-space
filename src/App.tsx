@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react'
 import useWeb3Modal from "./hooks/useWeb3Modal";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Home } from "./pages";
+import { Place } from "./pages";
 import { useAlert } from 'react-alert';
-import Place from './pages/Place';
 
 function App() {
 	const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal({ NETWORK: "mumbai" });

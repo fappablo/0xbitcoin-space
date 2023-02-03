@@ -21,11 +21,11 @@ export interface TooltipProps {
     scale: number;
     matrix: any[][];
     canvas: HTMLCanvasElement | null;
-    currentcolor: string;
 }
 
 export interface ShoppingCartProps {
     provider?: any;
     pixels?: [number, number, string][]
     removePixel: (i: number) => void;
+    clearPixels: () => void;
 }

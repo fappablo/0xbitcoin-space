@@ -1,22 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { TooltipProps } from "../../Utils";
 
-const Tooltip = ({ scale, matrix, canvas, currentcolor }: TooltipProps) => {
+const Tooltip = ({ scale, matrix, canvas }: TooltipProps) => {
     const [tooltip, setTooltip] = useState<HTMLDivElement | undefined>(undefined);
-    const [colorSelection, setColorSelection] = useState<HTMLDivElement | undefined>(undefined);
     const [coords, setCoords] = useState<[number, number]>([0, 0]);
     const tooltipRef = useCallback((node: HTMLDivElement) => {
         if (node) {
             setTooltip(node);
         }
     }, []);
-
-    useEffect(() => {
-        if (!colorSelection) {
-            return;
-        }
-        colorSelection.style["boxShadow"] = currentcolor + " 0px 0px 0px 15px inset";
-    }, [currentcolor, colorSelection, tooltip])
 
     useEffect(() => {
         if (!canvas || !tooltip) {
@@ -31,18 +23,16 @@ const Tooltip = ({ scale, matrix, canvas, currentcolor }: TooltipProps) => {
 
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left);
-            const y = (e.clientY - rect.top);
-            if (!matrix[Math.floor(x / scale)][Math.floor(y / scale)]) {
+            const x = (e.x - rect.left);
+            const y = (e.y - rect.top);
+            if (!matrix[Math.floor(x / scale)] || !matrix[Math.floor(x / scale)][Math.floor(y / scale)]) {
                 return;
             }
             setCoords([Math.floor(x / scale), Math.floor(y / scale)]);
-            tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / scale) + "px," + (y + tooltip.clientHeight + 10) + "px)";
+            tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / scale) + "px," + (y + tooltip.clientHeight / 4) + "px)";
         });
 
         return (() => {
-            canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
-
             canvas.removeEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
                 const x = (e.clientX - rect.left);
@@ -52,7 +42,7 @@ const Tooltip = ({ scale, matrix, canvas, currentcolor }: TooltipProps) => {
             });
         })
 
-    }, [canvas, tooltip, scale]);
+    }, [canvas, tooltip, scale, matrix]);
 
 
 

@@ -5,16 +5,24 @@ import Tooltip from "./Tooltip";
 import JSZip from "jszip";
 import { Web3Props } from "../../Utils";
 import Button from "react-bootstrap/esm/Button";
-import { log } from "console";
 
 const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [color, setColor] = useState<string>('#000000');
+    const sketchPickerRef = useRef<SketchPicker>(null);
+    const [currentColor, setCurrentColor] = useState<string>("#000000")
     const [shoppingPixels, setShoppingPixels] = useState<[number, number, string][]>([]);
     const [pixelMatrix, setPixelMatrix] = useState(Array(500).fill(null).map(() => Array(500).fill({ color: '#FFFFFF', owner: '0x0', name: null })));
     const [isLoadingPixels, setIsLoadingPixels] = useState(true);
     const [scale, setScale] = useState(2);
     const [update, setUpdate] = useState(0);
+
+    const setColor = (color: any) => {
+        if (!sketchPickerRef || !sketchPickerRef.current) {
+            return;
+        }
+        setCurrentColor(color.hex); 
+        sketchPickerRef.current.setState({ color: color.rgb });
+    }
 
     const removeFromShoppingPixels = (i: number) => {
         if (!shoppingPixels || !canvasRef.current) {
@@ -22,20 +30,12 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         }
 
         const newPixels = [...shoppingPixels];
-        const removedPixel = newPixels[i]
         newPixels.splice(i, 1);
         setShoppingPixels(newPixels);
+    }
 
-        // const canvas = canvasRef.current;
-        // const ctx = canvas.getContext("2d");
-
-        // if (!ctx) {
-        //     console.log("no context");
-
-        //     return;
-        // }
-
-        // ctx.clearRect(removedPixel[0] * scale, removedPixel[1] * scale, scale, scale);
+    const clearPixels = () => {
+        setShoppingPixels([]);
     }
 
     const addToShoppingPixels = (x: number, y: number, color: string) => {
@@ -59,7 +59,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     };
 
     function handleCanvasClick(e: any) {
-        if (!canvasRef.current) {
+        if (!canvasRef.current || !sketchPickerRef.current) {
             return;
         }
 
@@ -73,9 +73,9 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = (e.clientX - rect.left);
         const y = (e.clientY - rect.top);
-        ctx.fillStyle = color;
+        ctx.fillStyle = currentColor;
 
-        addToShoppingPixels(Math.floor(x / scale), Math.floor(y / scale), color);
+        addToShoppingPixels(Math.floor(x / scale), Math.floor(y / scale), currentColor);
 
         ctx.fillRect(Math.floor(x / scale) * scale, Math.floor(y / scale) * scale, scale, scale);
     }
@@ -129,16 +129,16 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         }
 
 
-    }, [scale, canvasRef, pixelMatrix])
+    }, [scale, canvasRef, pixelMatrix, isLoadingPixels])
 
     return (
         <>
-            <SketchPicker className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color.hex) }} />
+            <SketchPicker ref={sketchPickerRef} color={currentColor} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color) }} />
             <div className="canvas-wrapper">
-                <Tooltip scale={scale} matrix={pixelMatrix} canvas={canvasRef.current} currentcolor={color} />
+                <Tooltip scale={scale} matrix={pixelMatrix} canvas={canvasRef.current} />
                 <canvas width={500 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
             </div>
-            <ShoppingCart provider={provider} pixels={shoppingPixels} removePixel={removeFromShoppingPixels} />
+            <ShoppingCart provider={provider} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
             <div><Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 2 ? setScale(scale - 1) : null} > -</Button></div>
             <div><Button disabled={isLoadingPixels} onClick={() => setUpdate(update + 1)}>{isLoadingPixels ? "Loading" : "Update"}</Button></div>
         </>
