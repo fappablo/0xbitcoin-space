@@ -1,9 +1,12 @@
-import { useRef, useState } from "react";
-import { CirclePicker } from 'react-color';
+import { useEffect, useRef, useState } from "react";
+import { SketchPicker } from 'react-color';
 import ShoppingCart from "./ShoppingCart";
 import Tooltip from "./Tooltip";
+import JSZip from "jszip";
+import { log } from "console";
+import { Web3Props } from "../../Utils";
 
-const Canvas = () => {
+const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [color, setColor] = useState<string>('#000000');
     const [shoppingPixels, setShoppingPixels] = useState<[number, number, string][]>([]);
@@ -66,20 +69,60 @@ const Canvas = () => {
         const y = (e.clientY - rect.top);
         ctx.fillStyle = color;
 
-        addToShoppingPixels(Math.floor(x / 10), Math.floor(y / 10), color);
+        addToShoppingPixels(Math.floor(x / 2), Math.floor(y / 2), color);
 
-        ctx.fillRect(Math.floor(x / 10) * 10, Math.floor(y / 10) * 10, 10, 10);
+        ctx.fillRect(Math.floor(x / 2) * 2, Math.floor(y / 2) * 2, 2, 2);
     }
+
+    useEffect(() => {
+        if (!canvasRef.current) {
+            return;
+        }
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+            return;
+        }
+
+        const matrix: any = Array(500).fill(null).map(() => Array(500).fill({ color: '#FFFFFF', owner: '0x0', name: null }));
+
+        fetch("https://0xbitcoin.xyz/map.zip", { mode: 'cors' })       // 1) fetch the url
+            .then(function (response) {
+                if (response.status === 200 || response.status === 0) {
+                    return Promise.resolve(response.blob());
+                } else {
+                    return Promise.reject(new Error(response.statusText));
+                }
+            })
+            .then(JSZip.loadAsync)                            // 3) chain with the zip promise
+            .then(function (zip: any) {
+                return zip.file("map.zip").async("string"); // 4) chain with the text content promise
+            })
+            .then(function success(rawdata) {                    // 5) display the result
+                const map = new Map<string, { name: string, pixels: [number, number, string][] }>(JSON.parse(rawdata));
+                for (const [owner, value] of map) { //owner=> {name: name, pixels: [x, y, color][]}
+                    for (const pixel of value.pixels) {
+                        matrix[pixel[0], pixel[1]] = { color: pixel[2], owner: owner, name: value.name };
+                        ctx.fillStyle = "#" + pixel[2];
+                        ctx.fillRect(pixel[0] * 2, pixel[1] * 2, 2, 2);
+                    }
+                }
+            }, function error(e) {
+                console.log(e);
+            });
+    }, [canvasRef])
 
 
     return (
         <>
-            <CirclePicker colors={["#000000", "#ffff", "#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4", "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722", "#795548", "#607d8b"]} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color.hex) }} />
+            <SketchPicker color={"#FFFFa"} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color.hex) }} />
             <div className="canvas-wrapper">
                 <Tooltip canvas={canvasRef.current} currentcolor={color} />
-                <canvas width={2000} height={2000} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
+                <canvas width={1000} height={1000} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
             </div>
-            <ShoppingCart pixels={shoppingPixels} removePixel={removeFromShoppingPixels} />
+            <ShoppingCart provider={provider} pixels={shoppingPixels} removePixel={removeFromShoppingPixels} />
         </>
     );
 };

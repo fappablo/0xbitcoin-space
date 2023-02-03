@@ -40,7 +40,7 @@ const Tooltip = ({ canvas, currentcolor }: TooltipProps) => {
             const rect = canvas.getBoundingClientRect();
             const x = (e.clientX - rect.left);
             const y = (e.clientY - rect.top);
-            setCoords("x: " + Math.floor(x / 10) + " y: " + Math.floor(y / 10));
+            setCoords("x: " + Math.floor(x / 2) + " y: " + Math.floor(y / 2));
             tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / 2) + "px," + (y + tooltip.clientHeight + 10) + "px)";
         });
 
