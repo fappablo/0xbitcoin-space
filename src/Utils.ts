@@ -18,6 +18,8 @@ export interface Web3Props {
 
 
 export interface TooltipProps {
+    scale: number;
+    matrix: any[][];
     canvas: HTMLCanvasElement | null;
     currentcolor: string;
 }

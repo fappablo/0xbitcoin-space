@@ -33,7 +33,7 @@ const ShoppingCart = ({ provider, pixels, removePixel }: ShoppingCartProps) => {
         })
         await contract.placePixels(x, y, colors);
         pixels?.forEach((item, index) => {
-            removePixel(index)
+            removePixel(index);
         })
     }
 
@@ -43,12 +43,7 @@ const ShoppingCart = ({ provider, pixels, removePixel }: ShoppingCartProps) => {
             pixels.forEach((item, index) => {
                 divs.push(
                     <div>
-                        <div className="coords">{"x: " + item[0] + " y: " + item[1]}</div>
-                        <div className="tooltip-color-outer">
-                            <span>
-                                <div className={"cart-color-section"} style={{ 'boxShadow': `${item[2]} 0px 0px 0px 15px inset` }}></div>
-                            </span>
-                        </div>
+                        <div style={{ 'textShadow': `1px 1px ${item[2]}` }} className="coords">{"(" + item[0] + ", " + item[1] + ")"}</div>
                         <Button onClick={() => { removePixel(index) }}>Remove</Button >
                     </div>
                 );

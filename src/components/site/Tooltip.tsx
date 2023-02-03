@@ -1,20 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { TooltipProps } from "../../Utils";
 
-const Tooltip = ({ canvas, currentcolor }: TooltipProps) => {
+const Tooltip = ({ scale, matrix, canvas, currentcolor }: TooltipProps) => {
     const [tooltip, setTooltip] = useState<HTMLDivElement | undefined>(undefined);
     const [colorSelection, setColorSelection] = useState<HTMLDivElement | undefined>(undefined);
-    const [coords, setCoords] = useState<string | undefined>("x: 0 y: 0");
-
+    const [coords, setCoords] = useState<[number, number]>([0, 0]);
     const tooltipRef = useCallback((node: HTMLDivElement) => {
         if (node) {
             setTooltip(node);
-        }
-    }, []);
-
-    const colorSelectionRef = useCallback((node: HTMLDivElement) => {
-        if (node) {
-            setColorSelection(node);
         }
     }, []);
 
@@ -40,27 +33,39 @@ const Tooltip = ({ canvas, currentcolor }: TooltipProps) => {
             const rect = canvas.getBoundingClientRect();
             const x = (e.clientX - rect.left);
             const y = (e.clientY - rect.top);
-            setCoords("x: " + Math.floor(x / 2) + " y: " + Math.floor(y / 2));
-            tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / 2) + "px," + (y + tooltip.clientHeight + 10) + "px)";
+            if (!matrix[Math.floor(x / scale)][Math.floor(y / scale)]) {
+                return;
+            }
+            setCoords([Math.floor(x / scale), Math.floor(y / scale)]);
+            tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / scale) + "px," + (y + tooltip.clientHeight + 10) + "px)";
         });
 
         return (() => {
             canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+
+            canvas.removeEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left);
+                const y = (e.clientY - rect.top);
+                setCoords([Math.floor(x / scale), Math.floor(y / scale)]);
+                tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / scale) + "px," + (y + tooltip.clientHeight + 10) + "px)";
+            });
         })
 
-    }, [canvas, tooltip]);
+    }, [canvas, tooltip, scale]);
 
 
 
     return (
         <div className="coordinate-tooltip" ref={tooltipRef}>
-            {coords}
-            <div className="tooltip-color-outer">
+            <div>{"(" + coords[0] + ", " + coords[1] + ")"}</div>
+            <div>{"#" + matrix[coords[0]][coords[1]].color}</div>
+            {/* <div className="tooltip-color-outer">
                 <span>
                     <div className="tooltip-color-selection" ref={colorSelectionRef}></div>
                 </span>
-            </div>
-            <div>{"Placed By"}</div>
+            </div> */}
+            <div>{(matrix[coords[0]][coords[1]].name !== 'null') ? matrix[coords[0]][coords[1]].name : (matrix[coords[0]][coords[1]].owner).substring(0, 10)}</div>
         </div>
     );
 };

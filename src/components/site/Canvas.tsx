@@ -3,13 +3,18 @@ import { SketchPicker } from 'react-color';
 import ShoppingCart from "./ShoppingCart";
 import Tooltip from "./Tooltip";
 import JSZip from "jszip";
-import { log } from "console";
 import { Web3Props } from "../../Utils";
+import Button from "react-bootstrap/esm/Button";
+import { log } from "console";
 
 const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [color, setColor] = useState<string>('#000000');
     const [shoppingPixels, setShoppingPixels] = useState<[number, number, string][]>([]);
+    const [pixelMatrix, setPixelMatrix] = useState(Array(500).fill(null).map(() => Array(500).fill({ color: '#FFFFFF', owner: '0x0', name: null })));
+    const [isLoadingPixels, setIsLoadingPixels] = useState(true);
+    const [scale, setScale] = useState(2);
+    const [update, setUpdate] = useState(0);
 
     const removeFromShoppingPixels = (i: number) => {
         if (!shoppingPixels || !canvasRef.current) {
@@ -21,16 +26,16 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         newPixels.splice(i, 1);
         setShoppingPixels(newPixels);
 
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
+        // const canvas = canvasRef.current;
+        // const ctx = canvas.getContext("2d");
 
-        if (!ctx) {
-            console.log("no context");
+        // if (!ctx) {
+        //     console.log("no context");
 
-            return;
-        }
+        //     return;
+        // }
 
-        ctx.clearRect(removedPixel[0] * 10, removedPixel[1] * 10, 10, 10);
+        // ctx.clearRect(removedPixel[0] * scale, removedPixel[1] * scale, scale, scale);
     }
 
     const addToShoppingPixels = (x: number, y: number, color: string) => {
@@ -43,6 +48,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
                 setShoppingPixels(newPixels);
                 return true;
             }
+            return false;
         })) {
             return;
         };
@@ -69,25 +75,14 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         const y = (e.clientY - rect.top);
         ctx.fillStyle = color;
 
-        addToShoppingPixels(Math.floor(x / 2), Math.floor(y / 2), color);
+        addToShoppingPixels(Math.floor(x / scale), Math.floor(y / scale), color);
 
-        ctx.fillRect(Math.floor(x / 2) * 2, Math.floor(y / 2) * 2, 2, 2);
+        ctx.fillRect(Math.floor(x / scale) * scale, Math.floor(y / scale) * scale, scale, scale);
     }
 
     useEffect(() => {
-        if (!canvasRef.current) {
-            return;
-        }
-
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-
-        if (!ctx) {
-            return;
-        }
-
-        const matrix: any = Array(500).fill(null).map(() => Array(500).fill({ color: '#FFFFFF', owner: '0x0', name: null }));
-
+        const matrix: any = [...pixelMatrix];
+        setIsLoadingPixels(true);
         fetch("https://0xbitcoin.xyz/map.zip", { mode: 'cors' })       // 1) fetch the url
             .then(function (response) {
                 if (response.status === 200 || response.status === 0) {
@@ -104,25 +99,48 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
                 const map = new Map<string, { name: string, pixels: [number, number, string][] }>(JSON.parse(rawdata));
                 for (const [owner, value] of map) { //owner=> {name: name, pixels: [x, y, color][]}
                     for (const pixel of value.pixels) {
-                        matrix[pixel[0], pixel[1]] = { color: pixel[2], owner: owner, name: value.name };
-                        ctx.fillStyle = "#" + pixel[2];
-                        ctx.fillRect(pixel[0] * 2, pixel[1] * 2, 2, 2);
+                        matrix[pixel[0]][pixel[1]] = { color: pixel[2], owner: owner, name: value.name };
                     }
                 }
+                setPixelMatrix(matrix);
+                setIsLoadingPixels(false);
             }, function error(e) {
                 console.log(e);
             });
-    }, [canvasRef])
+    }, [update])
 
+    useEffect(() => {
+        if (!canvasRef.current || !pixelMatrix || isLoadingPixels) {
+            return;
+        }
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+            return;
+        }
+
+        for (let i = 0; i < pixelMatrix.length; i++) {
+            for (let j = 0; j < pixelMatrix[i].length; j++) {
+                ctx.fillStyle = "#" + pixelMatrix[i][j].color;
+                ctx.fillRect(i * scale, j * scale, scale, scale);
+            }
+        }
+
+
+    }, [scale, canvasRef, pixelMatrix])
 
     return (
         <>
-            <SketchPicker color={"#FFFFa"} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color.hex) }} />
+            <SketchPicker className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color.hex) }} />
             <div className="canvas-wrapper">
-                <Tooltip canvas={canvasRef.current} currentcolor={color} />
-                <canvas width={1000} height={1000} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
+                <Tooltip scale={scale} matrix={pixelMatrix} canvas={canvasRef.current} currentcolor={color} />
+                <canvas width={500 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
             </div>
             <ShoppingCart provider={provider} pixels={shoppingPixels} removePixel={removeFromShoppingPixels} />
+            <div><Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 2 ? setScale(scale - 1) : null} > -</Button></div>
+            <div><Button disabled={isLoadingPixels} onClick={() => setUpdate(update + 1)}>{isLoadingPixels ? "Loading" : "Update"}</Button></div>
         </>
     );
 };

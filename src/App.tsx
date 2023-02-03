@@ -104,8 +104,7 @@ function App() {
 		<>
 			<BrowserRouter>
 				<Routes>
-					<Route path='/' element={<Home loadWeb3Modal={loadWeb3Modal} provider={provider} logoutOfWeb3Modal={logoutOfWeb3Modal} setLoggedIn={setLoggedIn} account={account} loggedIn={loggedIn} />} />
-					<Route path='home' element={<Home loadWeb3Modal={loadWeb3Modal} provider={provider} logoutOfWeb3Modal={logoutOfWeb3Modal} setLoggedIn={setLoggedIn} account={account} loggedIn={loggedIn} />} />
+					<Route path='/' element={<Place loadWeb3Modal={loadWeb3Modal} provider={provider} logoutOfWeb3Modal={logoutOfWeb3Modal} setLoggedIn={setLoggedIn} account={account} loggedIn={loggedIn} />} />
 					<Route path='place' element={<Place loadWeb3Modal={loadWeb3Modal} provider={provider} logoutOfWeb3Modal={logoutOfWeb3Modal} setLoggedIn={setLoggedIn} account={account} loggedIn={loggedIn} />} />
 				</Routes>
 			</BrowserRouter>
