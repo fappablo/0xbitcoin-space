@@ -189,11 +189,13 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             <SketchPicker ref={sketchPickerRef} color={currentColor} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color) }} />
             <div className="canvas-wrapper" ref={wrapperRef}>
                 <Tooltip scale={scale} matrix={pixelMatrix} canvas={canvasRef.current} />
-                <canvas width={500 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
+                <canvas width={1000 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
             </div>
             <ShoppingCart account={account} provider={provider} loadWeb3Modal={loadWeb3Modal} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
-            <div><Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 2 ? setScale(scale - 1) : null} > -</Button></div>
-            <div><Button disabled={isLoadingPixels} onClick={() => setUpdate(update + 1)}>{isLoadingPixels ? "Loading" : "Update"}</Button></div>
+            <div className="scaling-buttons">
+                <Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 2 ? setScale(scale - 1) : null} > -</Button>
+                <div><Button disabled={isLoadingPixels} onClick={() => setUpdate(update + 1)}>{isLoadingPixels ? "Loading" : "Update"}</Button></div>
+            </div>
         </>
     );
 };
