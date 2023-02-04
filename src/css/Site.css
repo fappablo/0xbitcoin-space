@@ -422,7 +422,7 @@
 .shopping-cart-list {
 	height: 90%;
 	max-height: 50vh;
-	overflow: scroll;
+	overflow: auto;
 }
 
 .shopping-cart-list>div {
@@ -482,10 +482,11 @@
 }
 
 .canvas-wrapper {
-	grid-area: 1 / 1 / 6 / 6;
-	width: 100%;
+	grid-area: 1 / 2 / 6 / 5;
 	height: 100%;
-	overflow: scroll;
+	overflow: auto;
+	justify-self: center;
+	align-self: center;
 }
 
 .place-canvas {

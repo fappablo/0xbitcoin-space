@@ -115,8 +115,8 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         }
 
         const rect = canvasRef.current.getBoundingClientRect();
-        const x = (e.clientX - rect.left);
-        const y = (e.clientY - rect.top);
+        const x = (e.clientX - rect.left - canvas.parentElement?.scrollLeft!);
+        const y = (e.clientY - rect.y  - canvas.parentElement?.scrollTop!);
         ctx.fillStyle = currentColor;
 
         addToShoppingPixels(Math.floor(x / scale), Math.floor(y / scale), currentColor);
@@ -163,8 +163,6 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
 
-        console.log(scale)
-
         if (!ctx) {
             return;
         }
@@ -191,7 +189,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             <SketchPicker ref={sketchPickerRef} color={currentColor} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color) }} />
             <div className="canvas-wrapper" ref={wrapperRef}>
                 <Tooltip scale={scale} matrix={pixelMatrix} canvas={canvasRef.current} />
-                <canvas width={1000 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
+                <canvas width={500 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
             </div>
             <ShoppingCart account={account} provider={provider} loadWeb3Modal={loadWeb3Modal} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
             <div className="scaling-buttons">
