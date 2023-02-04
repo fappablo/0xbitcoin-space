@@ -24,6 +24,7 @@ export interface TooltipProps {
 }
 
 export interface ShoppingCartProps {
+    account?: string,
     loadWeb3Modal?: any;
     provider?: any;
     pixels?: [number, number, string][]

@@ -31,18 +31,18 @@ function App() {
 		const handleChainChanged = (_chainId: string) => {
 			alert.removeAll();
 			// We recommend reloading the page, unless you must do otherwise
-			if (parseInt(_chainId) === 80001) {
+			if (parseInt(_chainId) === 137) {
 				setChain(parseInt(_chainId));
 				console.log(parseInt(_chainId));
 
 				return;
 			} else {
-				alert.info("Please connect to Mumbai testnet");
+				alert.info("Please connect to Polygon");
 				setChain(parseInt(_chainId));
 				console.log(parseInt(_chainId));
 
 				provider
-					.request({ method: "wallet_switchEthereumChain", params: [{ chainId: '0x13881' }] })
+					.request({ method: "wallet_switchEthereumChain", params: [{ chainId: '0x89' }] })
 					.catch((error: any) => {
 						if (error.code === 4902 || error.code === -32603) {
 							provider
@@ -50,10 +50,10 @@ function App() {
 									method: 'wallet_addEthereumChain',
 									params: [
 										{
-											chainId: '0x13881',
-											rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
-											blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
-											chainName: "Mumbai",
+											chainId: '0x89',
+											rpcUrls: ['https://polygon-rpc.com/'],
+											blockExplorerUrls: ["https://polygonscan.com/"],
+											chainName: "Polygon Mainnet",
 											nativeCurrency: {
 												name: "MATIC",
 												symbol: "MATIC", // 2-6 characters long

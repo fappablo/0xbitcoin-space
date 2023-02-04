@@ -24,6 +24,31 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         sketchPickerRef.current.setState({ color: color.hex });
     }
 
+    const drawShoppingPixels = (newShoppingPixels: [number, number, string][]) => {
+        if (!canvasRef.current || !pixelMatrix) {
+            return;
+        }
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+            return;
+        }
+
+        for (let i = 0; i < pixelMatrix.length; i++) {
+            for (let j = 0; j < pixelMatrix[i].length; j++) {
+                ctx.fillStyle = "#" + pixelMatrix[i][j].color;
+                ctx.fillRect(i * scale, j * scale, scale, scale);
+            }
+        }
+
+        for (let i = 0; i < newShoppingPixels.length; i++) {
+            ctx.fillStyle = newShoppingPixels[i][2];
+            ctx.fillRect(newShoppingPixels[i][0] * scale, newShoppingPixels[i][1] * scale, scale, scale);
+        }
+    }
+
     const removeFromShoppingPixels = (i: number) => {
         if (!shoppingPixels || !canvasRef.current) {
             return;
@@ -32,6 +57,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         const newPixels = [...shoppingPixels];
         newPixels.splice(i, 1);
         setShoppingPixels(newPixels);
+        drawShoppingPixels(newPixels);
     }
 
     const clearPixels = () => {
@@ -129,7 +155,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     }, [update])
 
     useEffect(() => {
-        if (!canvasRef.current || !pixelMatrix) {
+        if (!canvasRef.current || !pixelMatrix || !shoppingPixels   ) {
             return;
         }
 
@@ -152,7 +178,6 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             ctx.fillRect(shoppingPixels[i][0] * scale, shoppingPixels[i][1] * scale, scale, scale);
         }
 
-
     }, [scale, canvasRef, pixelMatrix, isLoadingPixels])
 
     return (
@@ -162,7 +187,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
                 <Tooltip scale={scale} matrix={pixelMatrix} canvas={canvasRef.current} />
                 <canvas width={500 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
             </div>
-            <ShoppingCart provider={provider} loadWeb3Modal={loadWeb3Modal} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
+            <ShoppingCart account={account} provider={provider} loadWeb3Modal={loadWeb3Modal} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
             <div><Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 2 ? setScale(scale - 1) : null} > -</Button></div>
             <div><Button disabled={isLoadingPixels} onClick={() => setUpdate(update + 1)}>{isLoadingPixels ? "Loading" : "Update"}</Button></div>
         </>

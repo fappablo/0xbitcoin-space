@@ -11,7 +11,7 @@ const Place = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             <Navbar ensName={ensName} account={account} loadWeb3Modal={loadWeb3Modal} provider={provider} />
 
             <div className='site-section smaller-section' >
-                <Canvas provider={provider} loadWeb3Modal={loadWeb3Modal} />
+                <Canvas account={account} provider={provider} loadWeb3Modal={loadWeb3Modal} />
             </div>
 
             <Footer />
