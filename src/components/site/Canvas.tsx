@@ -163,6 +163,8 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
 
+        console.log(scale)
+
         if (!ctx) {
             return;
         }
