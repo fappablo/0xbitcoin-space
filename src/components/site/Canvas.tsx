@@ -7,6 +7,7 @@ import { Web3Props } from "../../Utils";
 import Button from "react-bootstrap/esm/Button";
 
 const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
+    const wrapperRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const sketchPickerRef = useRef<SketchPicker>(null);
     const [currentColor, setCurrentColor] = useState<string>("#000000")
@@ -178,12 +179,15 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             ctx.fillRect(shoppingPixels[i][0] * scale, shoppingPixels[i][1] * scale, scale, scale);
         }
 
+        wrapperRef.current!.scrollTop = (canvas.clientHeight - wrapperRef.current?.clientHeight!) / 2;
+        wrapperRef.current!.scrollLeft = (canvas.clientWidth - wrapperRef.current?.clientWidth!) / 2;
+
     }, [scale, canvasRef, pixelMatrix, isLoadingPixels])
 
     return (
         <>
             <SketchPicker ref={sketchPickerRef} color={currentColor} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color) }} />
-            <div className="canvas-wrapper">
+            <div className="canvas-wrapper" ref={wrapperRef}>
                 <Tooltip scale={scale} matrix={pixelMatrix} canvas={canvasRef.current} />
                 <canvas width={500 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
             </div>
