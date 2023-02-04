@@ -23,8 +23,8 @@ const Tooltip = ({ scale, matrix, canvas }: TooltipProps) => {
 
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const x = (e.x - rect.left);
-            const y = (e.y - rect.top);
+            const x = (e.clientX - rect.left);
+            const y = (e.clientY - rect.y - canvas.parentElement?.scrollTop!);
             if (!matrix[Math.floor(x / scale)] || !matrix[Math.floor(x / scale)][Math.floor(y / scale)]) {
                 return;
             }
@@ -35,8 +35,8 @@ const Tooltip = ({ scale, matrix, canvas }: TooltipProps) => {
         return (() => {
             canvas.removeEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
-                const x = (e.x - rect.left);
-                const y = (e.y - rect.top);
+                const x = (e.clientX - rect.left);
+                const y = (e.clientY - rect.y  - canvas.parentElement?.scrollTop!);
                 if (!matrix[Math.floor(x / scale)] || !matrix[Math.floor(x / scale)][Math.floor(y / scale)]) {
                     return;
                 }

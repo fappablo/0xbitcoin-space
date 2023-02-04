@@ -437,7 +437,7 @@
 }
 
 .coordinate-tooltip {
-	position: relative;
+	position: absolute;
 	padding: 5px 15px;
 	color: black;
 	background-color: rgba(128, 128, 128, 0.632);
