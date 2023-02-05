@@ -6,6 +6,8 @@ import JSZip from "jszip";
 import { Web3Props } from "../../Utils";
 import Button from "react-bootstrap/esm/Button";
 import Form from 'react-bootstrap/Form';
+import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
+import { IoReloadOutline } from "react-icons/io5";
 
 const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -214,15 +216,15 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
 
     return (
         <>
-            <SketchPicker ref={sketchPickerRef} color={currentColor} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color) }} />
+            <SketchPicker disableAlpha={true} ref={sketchPickerRef} color={currentColor} className="circle-color-picker" onChange={(color: any, e: any) => { setColor(color) }} />
             <div className="canvas-wrapper" ref={wrapperRef}>
                 <Tooltip scale={scale} matrix={pixelMatrix} canvas={canvasRef.current} />
                 <canvas width={500 * scale} height={500 * scale} className="place-canvas" tabIndex={0} ref={canvasRef} onClick={handleCanvasClick}></canvas>
             </div>
             <ShoppingCart account={account} provider={provider} loadWeb3Modal={loadWeb3Modal} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
             <div className="scaling-buttons">
-                <Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 1 ? setScale(scale - 1) : null} > -</Button>
-                <Button disabled={isLoadingPixels} onClick={fetchCanvas}>{isLoadingPixels ? "Loading" : "Update"}</Button>
+                <Button onClick={() => setScale(scale + 1)}><FaPlusCircle /></Button><Button onClick={() => scale > 1 ? setScale(scale - 1) : null} > <FaMinusCircle /></Button>
+                <Button disabled={isLoadingPixels} onClick={fetchCanvas}> <IoReloadOutline /></Button>
                 <Form.Check
                     type="switch"
                     id="custom-switch"

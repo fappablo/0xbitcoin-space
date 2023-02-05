@@ -5,6 +5,9 @@ import { Contract } from "@ethersproject/contracts";
 import { addresses, abis } from "../../contracts/src";
 import { Web3Provider } from "@ethersproject/providers";
 import { useAlert } from "react-alert";
+import { AiFillCloseCircle } from "react-icons/ai";
+import { FaTrashAlt } from "react-icons/fa";
+
 
 const PRICE_PER_PIXEL = 500000 / Math.pow(10, 8);
 
@@ -109,7 +112,7 @@ const ShoppingCart = ({ loadWeb3Modal, provider, account, pixels, removePixel, c
                 divs.push(
                     <div key={index}>
                         <div style={{ 'textShadow': `1px 1px ${item[2]}` }} className="coords">{"(" + item[0] + ", " + item[1] + ")"}</div>
-                        <Button onClick={() => { removePixel(index) }}>Remove</Button >
+                        <Button onClick={() => { removePixel(index) }}><FaTrashAlt/></Button >
                     </div>
                 );
             });
