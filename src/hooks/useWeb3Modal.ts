@@ -23,14 +23,14 @@ function useWeb3Modal(config: { autoLoad?: boolean, infuraId?: string, NETWORK?:
       walletconnect: {
         package: WalletConnectProvider,
         options: {
-          appName: "Dwarven Relics",
+          appName: "0xBitcoin Place",
           infuraId: infuraId
         }
       },
       coinbasewallet: {
         package: CoinbaseWalletSDK,
         options: {
-          appName: "Dwarven Relics",
+          appName: "0xBitcoin Place",
           infuraId: infuraId
         }
       }

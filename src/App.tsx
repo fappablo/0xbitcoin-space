@@ -8,7 +8,7 @@ import { Place } from "./pages";
 import { useAlert } from 'react-alert';
 
 function App() {
-	const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal({ NETWORK: "mumbai" });
+	const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal({ NETWORK: "Polygon Mainnet" });
 
 	const [account, setAccount] = useState<string | undefined>(undefined);
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -33,14 +33,10 @@ function App() {
 			// We recommend reloading the page, unless you must do otherwise
 			if (parseInt(_chainId) === 137) {
 				setChain(parseInt(_chainId));
-				console.log(parseInt(_chainId));
-
 				return;
 			} else {
 				alert.info("Please connect to Polygon");
 				setChain(parseInt(_chainId));
-				console.log(parseInt(_chainId));
-
 				provider
 					.request({ method: "wallet_switchEthereumChain", params: [{ chainId: '0x89' }] })
 					.catch((error: any) => {

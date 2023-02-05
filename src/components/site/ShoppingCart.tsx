@@ -67,7 +67,7 @@ const ShoppingCart = ({ loadWeb3Modal, provider, account, pixels, removePixel, c
         const y: number[] = [];
         const colors: string[] = [];
 
-        pixels?.forEach((item, index) => {
+        pixels.forEach((item,) => {
             x.push(item[0]);
             y.push(item[1]);
             colors.push("0x" + item[2].replace('#', ''));
@@ -78,12 +78,17 @@ const ShoppingCart = ({ loadWeb3Modal, provider, account, pixels, removePixel, c
             txhash = res.hash;
             const web3provider = new Web3Provider(provider);
             let txn = await web3provider.waitForTransaction(txhash);
+            
             if (txn.status) {
                 alert.success("Transaction succeded! \n Your pixels should appear in less than a minute");
             } else {
                 alert.error("There was an error in the transaction");
             }
-            updateBalanceAndAllowance();
+
+            setTimeout(() => {
+                updateBalanceAndAllowance();
+            }, 2000);
+
         }).catch((err: any) => { alert.error("There was an error\n" + err); });
 
         clearPixels();
@@ -91,7 +96,6 @@ const ShoppingCart = ({ loadWeb3Modal, provider, account, pixels, removePixel, c
 
     useEffect(() => {
         if (!provider || !account) {
-            console.log("check")
             return;
         }
 

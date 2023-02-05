@@ -5,6 +5,7 @@ import Tooltip from "./Tooltip";
 import JSZip from "jszip";
 import { Web3Props } from "../../Utils";
 import Button from "react-bootstrap/esm/Button";
+import Form from 'react-bootstrap/Form';
 
 const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -15,7 +16,53 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const [pixelMatrix, setPixelMatrix] = useState(Array(500).fill(null).map(() => Array(500).fill({ color: '#FFFFFF', owner: '0x0', name: null })));
     const [isLoadingPixels, setIsLoadingPixels] = useState(true);
     const [scale, setScale] = useState(1);
-    const [update, setUpdate] = useState(0);
+    const [autoUpdate, setAutoUpdate] = useState(true);
+
+    const fetchCanvas = () => {
+        console.log("re-fetching canvas")
+        const matrix: any = [...pixelMatrix];
+        setIsLoadingPixels(true);
+
+        fetch("https://0xbitcoin.xyz/map.zip", { mode: 'cors' })       // 1) fetch the url
+            .then(function (response) {
+                if (response.status === 200 || response.status === 0) {
+                    return Promise.resolve(response.blob());
+                } else {
+                    return Promise.reject(new Error(response.statusText));
+                }
+            })
+            .then(JSZip.loadAsync)                            // 3) chain with the zip promise
+            .then(function (zip: any) {
+                return zip.file("map.zip").async("string"); // 4) chain with the text content promise
+            })
+            .then(function success(rawdata) {                    // 5) display the result
+                const map = new Map<string, { name: string, pixels: [number, number, string][] }>(JSON.parse(rawdata));
+                for (const [owner, value] of map) { //owner=> {name: name, pixels: [x, y, color][]}
+                    for (const pixel of value.pixels) {
+                        matrix[pixel[0]][pixel[1]] = { color: pixel[2], owner: owner, name: value.name };
+                    }
+                }
+                setPixelMatrix(matrix);
+                setIsLoadingPixels(false);
+            }, function error(e) {
+                //try again
+                console.log(e);
+            });
+    }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (autoUpdate) {
+                fetchCanvas();
+            }
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, [autoUpdate]);
+
+    useEffect(() => {
+        fetchCanvas();
+    }, []);
 
     const setColor = (color: any) => {
         if (!sketchPickerRef || !sketchPickerRef.current) {
@@ -82,25 +129,32 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         }
     }
 
-    const addToShoppingPixels = (x: number, y: number, color: string) => {
-        if (shoppingPixels.some((item, index) => {
-            if (item[0] === x && item[1] === y && item[2] === color) {
-                return true;
-            } else if (item[0] === x && item[1] === y && item[2] !== color) {
+    const addToShoppingPixelsBetter = (x: number, y: number, color: string) => {
+        for (let i = 0; i < shoppingPixels.length; i++) {
+            const pixel = { x: shoppingPixels[i][0], y: shoppingPixels[i][1], color: shoppingPixels[i][2] };
+            if (pixel.x === x && pixel.y === y) {
+                //already in the list
+                if (pixel.color === color) {
+                    return;
+                }
+                //preexisting pixel color
+                if (color.toUpperCase() === ('#' + pixelMatrix[x][y].color).toUpperCase()) {
+                    removeFromShoppingPixels(i);
+                    return;
+                }
                 const newPixels = [...shoppingPixels];
-                newPixels[index] = [x, y, color];
+                newPixels[i] = [x, y, color];
                 setShoppingPixels(newPixels);
-                return true;
+                return;
             }
-            return false;
-        })) {
+        }
+        if (color.toUpperCase() === ('#' + pixelMatrix[x][y].color).toUpperCase()) {
             return;
-        };
-
+        }
         const newPixels = [...shoppingPixels];
         newPixels.push([x, y, color]);
         setShoppingPixels(newPixels);
-    };
+    }
 
     function handleCanvasClick(e: any) {
         if (!canvasRef.current || !sketchPickerRef.current) {
@@ -119,42 +173,9 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         const y = (e.clientY - rect.y);
         ctx.fillStyle = currentColor;
 
-        addToShoppingPixels(Math.floor(x / scale), Math.floor(y / scale), currentColor);
-
         ctx.fillRect(Math.floor(x / scale) * scale, Math.floor(y / scale) * scale, scale, scale);
+        addToShoppingPixelsBetter(Math.floor(x / scale), Math.floor(y / scale), currentColor);
     }
-
-    useEffect(() => {
-        const matrix: any = [...pixelMatrix];
-        setIsLoadingPixels(true);
-
-        fetch("https://0xbitcoin.xyz/map.zip", { mode: 'cors' })       // 1) fetch the url
-            .then(function (response) {
-                if (response.status === 200 || response.status === 0) {
-                    return Promise.resolve(response.blob());
-                } else {
-                    return Promise.reject(new Error(response.statusText));
-                }
-            })
-            .then(JSZip.loadAsync)                            // 3) chain with the zip promise
-            .then(function (zip: any) {
-                return zip.file("map.zip").async("string"); // 4) chain with the text content promise
-            })
-            .then(function success(rawdata) {                    // 5) display the result
-                const map = new Map<string, { name: string, pixels: [number, number, string][] }>(JSON.parse(rawdata));
-                for (const [owner, value] of map) { //owner=> {name: name, pixels: [x, y, color][]}
-                    for (const pixel of value.pixels) {
-                        matrix[pixel[0]][pixel[1]] = { color: pixel[2], owner: owner, name: value.name };
-                    }
-                }
-                setPixelMatrix(matrix);
-                setIsLoadingPixels(false);
-
-            }, function error(e) {
-                console.log(e);
-            });
-
-    }, [update])
 
     useEffect(() => {
         if (!wrapperRef || !canvasRef || !canvasRef.current) {
@@ -201,7 +222,14 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             <ShoppingCart account={account} provider={provider} loadWeb3Modal={loadWeb3Modal} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
             <div className="scaling-buttons">
                 <Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 1 ? setScale(scale - 1) : null} > -</Button>
-                <div><Button disabled={isLoadingPixels} onClick={() => setUpdate(update + 1)}>{isLoadingPixels ? "Loading" : "Update"}</Button></div>
+                <Button disabled={isLoadingPixels} onClick={fetchCanvas}>{isLoadingPixels ? "Loading" : "Update"}</Button>
+                <Form.Check
+                    type="switch"
+                    id="custom-switch"
+                    label="Auto-Update"
+                    onClick={() => setAutoUpdate(!autoUpdate)}
+                    defaultChecked={true}
+                />
             </div>
         </>
     );
