@@ -396,7 +396,7 @@
 	grid-column-gap: 0px;
 	grid-row-gap: 0px;
 	align-items: center;
-}
+}	
 
 .circle-color-picker {
 	grid-area: 2 / 1 / 4 / 2;
@@ -484,6 +484,7 @@
 .canvas-wrapper {
 	grid-area: 1 / 2 / 6 / 5;
 	height: 100%;
+	width: 100%;
 	overflow: auto;
 	justify-self: center;
 	align-self: center;
@@ -500,7 +501,6 @@
 .footer {
 	padding: 10px;
 	background-color: var(--site-primary);
-	bottom: 0;
 }
 
 .inner-container {

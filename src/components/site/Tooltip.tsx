@@ -23,25 +23,29 @@ const Tooltip = ({ scale, matrix, canvas }: TooltipProps) => {
 
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left - canvas.parentElement?.scrollLeft!);
-            const y = (e.clientY - rect.y - canvas.parentElement?.scrollTop!);
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.y;
+            const relativeX = (x - canvas.parentElement?.scrollLeft!);
+            const relativeY = (y - canvas.parentElement?.scrollTop!);
             if (!matrix[Math.floor(x / scale)] || !matrix[Math.floor(x / scale)][Math.floor(y / scale)]) {
                 return;
             }
             setCoords([Math.floor(x / scale), Math.floor(y / scale)]);
-            tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / scale) + "px," + (y + tooltip.clientHeight / 4) + "px)";
+            tooltip.style["transform"] = "translate(" + (relativeX - tooltip.clientWidth / 2) + "px," + (relativeY + tooltip.clientHeight / 4) + "px)";
         });
 
         return (() => {
             canvas.removeEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX - rect.left - canvas.parentElement?.scrollLeft!);
-                const y = (e.clientY - rect.y  - canvas.parentElement?.scrollTop!);
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.y;
+                const relativeX = (x - canvas.parentElement?.scrollLeft!);
+                const relativeY = (y - canvas.parentElement?.scrollTop!);
                 if (!matrix[Math.floor(x / scale)] || !matrix[Math.floor(x / scale)][Math.floor(y / scale)]) {
                     return;
                 }
                 setCoords([Math.floor(x / scale), Math.floor(y / scale)]);
-                tooltip.style["transform"] = "translate(" + (x - tooltip.clientWidth / scale) + "px," + (y + tooltip.clientHeight / 4) + "px)";
+                tooltip.style["transform"] = "translate(" + (relativeX - tooltip.clientWidth / 2) + "px," + (relativeY + tooltip.clientHeight / 4) + "px)";
             });
         })
 

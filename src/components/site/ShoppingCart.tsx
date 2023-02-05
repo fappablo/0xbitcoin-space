@@ -83,6 +83,7 @@ const ShoppingCart = ({ loadWeb3Modal, provider, account, pixels, removePixel, c
             } else {
                 alert.error("There was an error in the transaction");
             }
+            updateBalanceAndAllowance();
         }).catch((err: any) => { alert.error("There was an error\n" + err); });
 
         clearPixels();
@@ -114,9 +115,9 @@ const ShoppingCart = ({ loadWeb3Modal, provider, account, pixels, removePixel, c
 
     return (
         <div className={"shopping-cart"}>
-            <div>{"Balance: " + balance+ " 0xBTC"}</div>
+            <div>{"Balance: " + balance + " 0xBTC"}</div>
             <div className={"shopping-cart-list"}>{elements}</div>
-            <div>{pixels ? "Total: " + pixels?.length * PRICE_PER_PIXEL + " 0xBTC" : "Total: 0 0xBTC"}</div>
+            <div>{pixels ? "Total: " + (pixels?.length * PRICE_PER_PIXEL).toFixed(3) + " 0xBTC" : "Total: 0 0xBTC"}</div>
             <Button onClick={provider ? (allowance ? purchasePixels : approve0xBTC) : loadWeb3Modal}>{provider ? (allowance ? "Buy" : "Approve") : "Connect"}</Button>
             <Button onClick={clearPixels}>Clear</Button>
         </div>

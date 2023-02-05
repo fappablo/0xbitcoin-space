@@ -14,7 +14,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const [shoppingPixels, setShoppingPixels] = useState<[number, number, string][]>([]);
     const [pixelMatrix, setPixelMatrix] = useState(Array(500).fill(null).map(() => Array(500).fill({ color: '#FFFFFF', owner: '0x0', name: null })));
     const [isLoadingPixels, setIsLoadingPixels] = useState(true);
-    const [scale, setScale] = useState(2);
+    const [scale, setScale] = useState(1);
     const [update, setUpdate] = useState(0);
 
     const setColor = (color: any) => {
@@ -115,8 +115,8 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         }
 
         const rect = canvasRef.current.getBoundingClientRect();
-        const x = (e.clientX - rect.left - canvas.parentElement?.scrollLeft!);
-        const y = (e.clientY - rect.y  - canvas.parentElement?.scrollTop!);
+        const x = (e.clientX - rect.left);
+        const y = (e.clientY - rect.y);
         ctx.fillStyle = currentColor;
 
         addToShoppingPixels(Math.floor(x / scale), Math.floor(y / scale), currentColor);
@@ -127,6 +127,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     useEffect(() => {
         const matrix: any = [...pixelMatrix];
         setIsLoadingPixels(true);
+
         fetch("https://0xbitcoin.xyz/map.zip", { mode: 'cors' })       // 1) fetch the url
             .then(function (response) {
                 if (response.status === 200 || response.status === 0) {
@@ -156,7 +157,16 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     }, [update])
 
     useEffect(() => {
-        if (!canvasRef.current || !pixelMatrix || !shoppingPixels   ) {
+        if (!wrapperRef || !canvasRef || !canvasRef.current) {
+            return;
+        }
+        const canvas = canvasRef.current;
+        wrapperRef.current!.scrollTop = (canvas.clientHeight - wrapperRef.current?.clientHeight!) / 2;
+        wrapperRef.current!.scrollLeft = (canvas.clientWidth - wrapperRef.current?.clientWidth!) / 2;
+    }, [wrapperRef, canvasRef])
+
+    useEffect(() => {
+        if (!canvasRef.current || !pixelMatrix || !shoppingPixels) {
             return;
         }
 
@@ -179,9 +189,6 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             ctx.fillRect(shoppingPixels[i][0] * scale, shoppingPixels[i][1] * scale, scale, scale);
         }
 
-        wrapperRef.current!.scrollTop = (canvas.clientHeight - wrapperRef.current?.clientHeight!) / 2;
-        wrapperRef.current!.scrollLeft = (canvas.clientWidth - wrapperRef.current?.clientWidth!) / 2;
-
     }, [scale, canvasRef, pixelMatrix, isLoadingPixels])
 
     return (
@@ -193,7 +200,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             </div>
             <ShoppingCart account={account} provider={provider} loadWeb3Modal={loadWeb3Modal} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
             <div className="scaling-buttons">
-                <Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 2 ? setScale(scale - 1) : null} > -</Button>
+                <Button onClick={() => setScale(scale + 1)}>+</Button><Button onClick={() => scale > 1 ? setScale(scale - 1) : null} > -</Button>
                 <div><Button disabled={isLoadingPixels} onClick={() => setUpdate(update + 1)}>{isLoadingPixels ? "Loading" : "Update"}</Button></div>
             </div>
         </>

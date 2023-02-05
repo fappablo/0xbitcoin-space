@@ -20,7 +20,6 @@ const Navbar = ({ account, ensName, loadWeb3Modal, provider }: Web3Props) => {
 				<img className='logo' src='.\android-chrome-192x192.png' />
 			</Link>
 			<div className='navbar-menu'>
-				<Link className='nav-button' to={"/home"}>Home</Link>
 				{/* <Link className='nav-button' to={"/creation"}>Dwarf Creation</Link> */}
 				<Link className='nav-button' to={"/place"}>Place</Link>
 				{provider ?
