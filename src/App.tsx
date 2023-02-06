@@ -6,13 +6,16 @@ import useWeb3Modal from "./hooks/useWeb3Modal";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Place } from "./pages";
 import { useAlert } from 'react-alert';
+import About from './pages/About';
+import { Web3Provider } from '@ethersproject/providers';
+import Help from './pages/Help';
 
 function App() {
 	const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal({ NETWORK: "Polygon Mainnet" });
 
 	const [account, setAccount] = useState<string | undefined>(undefined);
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);
-	const [ensName, /*setEnsName*/] = useState<string | null>(null);
+	const [ensName, setEnsName] = useState<string | null>(null);
 
 	const [chain, setChain] = useState<number | undefined>(undefined);
 
@@ -20,10 +23,10 @@ function App() {
 	// Subscribe to accounts change
 	const handleAccountsChanged = async (accounts: string[]) => {
 		setAccount(accounts[0]);
-		// const web3provider = new Web3Provider(provider);
-		//TODO: ENS NAME RESOLVING ON POLYGON?
-		// const ensName = await web3provider.lookupAddress(accounts[0]);
-		// setEnsName(ensName);
+		const web3provider = new Web3Provider(provider);
+		// TODO: ENS NAME RESOLVING ON POLYGON?
+		const ensName = await web3provider.lookupAddress(accounts[0]);
+		setEnsName(ensName);
 	};
 
 
@@ -101,6 +104,8 @@ function App() {
 				<Routes>
 					<Route path='/' element={<Place loadWeb3Modal={loadWeb3Modal} provider={provider} logoutOfWeb3Modal={logoutOfWeb3Modal} setLoggedIn={setLoggedIn} account={account} loggedIn={loggedIn} />} />
 					<Route path='place' element={<Place loadWeb3Modal={loadWeb3Modal} provider={provider} logoutOfWeb3Modal={logoutOfWeb3Modal} setLoggedIn={setLoggedIn} account={account} loggedIn={loggedIn} />} />
+					<Route path='about' element={<About loadWeb3Modal={loadWeb3Modal} provider={provider} logoutOfWeb3Modal={logoutOfWeb3Modal} setLoggedIn={setLoggedIn} account={account} loggedIn={loggedIn} />} />
+					<Route path='help' element={<Help loadWeb3Modal={loadWeb3Modal} provider={provider} logoutOfWeb3Modal={logoutOfWeb3Modal} setLoggedIn={setLoggedIn} account={account} loggedIn={loggedIn} />} />
 				</Routes>
 			</BrowserRouter>
 		</>

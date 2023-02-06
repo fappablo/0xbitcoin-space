@@ -125,7 +125,7 @@ const ShoppingCart = ({ loadWeb3Modal, provider, account, pixels, removePixel, c
             <div>{"Balance: " + balance + " 0xBTC"}</div>
             <div className={"shopping-cart-list"}>{elements}</div>
             <div>{pixels ? "Total: " + (pixels?.length * PRICE_PER_PIXEL).toFixed(3) + " 0xBTC" : "Total: 0 0xBTC"}</div>
-            <Button onClick={provider ? (allowance ? purchasePixels : approve0xBTC) : loadWeb3Modal}>{provider ? (allowance ? "Buy" : "Approve") : "Connect"}</Button>
+            <Button className={"mb-1"} onClick={provider ? (allowance ? purchasePixels : approve0xBTC) : loadWeb3Modal}>{provider ? (allowance ? "Buy" : "Approve") : "Connect"}</Button>
             <Button onClick={clearPixels}>Clear</Button>
         </div>
     );

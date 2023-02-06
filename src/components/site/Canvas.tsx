@@ -6,8 +6,10 @@ import JSZip from "jszip";
 import { Web3Props } from "../../Utils";
 import Button from "react-bootstrap/esm/Button";
 import Form from 'react-bootstrap/Form';
-import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
+import { FaEraser, FaMinusCircle, FaPencilAlt, FaPlusCircle } from "react-icons/fa";
 import { IoReloadOutline } from "react-icons/io5";
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 
 const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -19,6 +21,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
     const [isLoadingPixels, setIsLoadingPixels] = useState(true);
     const [scale, setScale] = useState(1);
     const [autoUpdate, setAutoUpdate] = useState(true);
+    const [eraserMode, setEraserMode] = useState(false);
 
     const fetchCanvas = () => {
         console.log("re-fetching canvas")
@@ -173,6 +176,20 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = (e.clientX - rect.left);
         const y = (e.clientY - rect.y);
+
+        if (eraserMode) {
+            const targetX = Math.floor(x / scale);
+            const targetY = Math.floor(y / scale);
+            for (let i = 0; i < shoppingPixels.length; i++) {
+                const pixel = { x: shoppingPixels[i][0], y: shoppingPixels[i][1], color: shoppingPixels[i][2] };
+                if (pixel.x === targetX && pixel.y === targetY) {
+                    removeFromShoppingPixels(i);
+                    return;
+                }
+            }
+            return;
+        }
+
         ctx.fillStyle = currentColor;
 
         ctx.fillRect(Math.floor(x / scale) * scale, Math.floor(y / scale) * scale, scale, scale);
@@ -186,7 +203,7 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
         const canvas = canvasRef.current;
         wrapperRef.current!.scrollTop = (canvas.clientHeight - wrapperRef.current?.clientHeight!) / 2;
         wrapperRef.current!.scrollLeft = (canvas.clientWidth - wrapperRef.current?.clientWidth!) / 2;
-    }, [wrapperRef, canvasRef])
+    }, [wrapperRef, canvasRef]);
 
     useEffect(() => {
         if (!canvasRef.current || !pixelMatrix || !shoppingPixels) {
@@ -223,8 +240,17 @@ const Canvas = ({ account, ensName, provider, loadWeb3Modal }: Web3Props) => {
             </div>
             <ShoppingCart account={account} provider={provider} loadWeb3Modal={loadWeb3Modal} pixels={shoppingPixels} clearPixels={clearPixels} removePixel={removeFromShoppingPixels} />
             <div className="scaling-buttons">
-                <Button onClick={() => setScale(scale + 1)}><FaPlusCircle /></Button><Button onClick={() => scale > 1 ? setScale(scale - 1) : null} > <FaMinusCircle /></Button>
-                <Button disabled={isLoadingPixels} onClick={fetchCanvas}> <IoReloadOutline /></Button>
+                <Button className="mr-1" onClick={() => setScale(scale + 1)}><FaPlusCircle /></Button>{' '}
+                <Button onClick={() => scale > 1 ? setScale(scale - 1) : null} > <FaMinusCircle /></Button>{' '}
+                <ToggleButtonGroup type="radio" name="options" defaultValue={1}>
+                    <ToggleButton id="tbg-radio-1" value={1} onClick={() => setEraserMode(false)}>
+                        <FaPencilAlt />
+                    </ToggleButton>
+                    <ToggleButton id="tbg-radio-2" value={2} onClick={() => setEraserMode(true)}>
+                        <FaEraser />
+                    </ToggleButton>
+                </ToggleButtonGroup> {' '}
+                <Button disabled={isLoadingPixels} onClick={fetchCanvas}> <IoReloadOutline /></Button>{' '}
                 <Form.Check
                     type="switch"
                     id="custom-switch"
