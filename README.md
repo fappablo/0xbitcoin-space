@@ -1,6 +1,7 @@
-# dwarven-relics-frontend
+# 0xbitcoin-space
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[Contract](https://github.com/fappablo/0xbitcoin-space-contract).\
+[Backend](https://github.com/fappablo/0xbitcoin-place-backend).
 
 ## Available Scripts
 
